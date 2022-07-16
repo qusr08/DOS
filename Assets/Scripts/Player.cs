@@ -23,6 +23,7 @@ public class Player : MonoBehaviour {
 		Vector3 axis = new Vector3(direction.y, 0, (direction.y == 0 ? -1 : 1) * direction.x);
 		float degreesToMove = 90;
 
+		// Slowly rotate the die around a point to have it move
 		while (degreesToMove > 0) {
 			transform.RotateAround(point, axis, movementSpeed);
 			degreesToMove -= movementSpeed;
@@ -30,15 +31,18 @@ public class Player : MonoBehaviour {
 			yield return new WaitForEndOfFrame( );
 		}
 
-		//transform.RotateAround((Vector3.forward + Vector3.down) / 2f, Vector3.right, 90); // up
-		//transform.RotateAround((Vector3.right + Vector3.down) / 2f, Vector3.forward, -90); // right
-		//transform.RotateAround((Vector3.back + Vector3.down) / 2f, Vector3.left, 90); // down
-		//transform.RotateAround((Vector3.left + Vector3.down) / 2f, Vector3.back, -90); // left
-
-		// Rotate the transform around a point
-		//transform.RotateAround(transform.position + ((point + Vector3.down) / 2f), axis, 90);
-
 		move = null;
+	}
+
+	private bool IsValidWorldTile (Vector2 direction) {
+		// Check to see if there is a world tile at the position dictated by the direction
+		if (Physics.Raycast(transform.position + new Vector3(direction.x, 0, direction.y), Vector3.down, out RaycastHit raycastHit)) {
+			// TODO: check to see if the world tile type allows for the die to go onto it
+			
+			return true;
+		}
+
+		return false;
 	}
 
 	private void OnMove (InputValue inputValue) {
@@ -51,7 +55,7 @@ public class Player : MonoBehaviour {
 		}
 
 		// If the player is not already moving, move in the direction on the input
-		if (!IsMoving) {
+		if (!IsMoving && IsValidWorldTile(movement)) {
 			move = StartCoroutine(IMove(movement));
 		}
 	}
