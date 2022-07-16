@@ -3,21 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Player : MonoBehaviour {
+public class Die : MonoBehaviour {
 	[SerializeField] [Min(0.001f)] private float movementSpeed;
 
 	private Coroutine move = null;
 	private Vector3 movement = Vector3.zero;
-	private Vector3[ ] faces;
+	private Vector3[ ] faces = new Vector3[6];
 
 	public bool IsMoving {
 		get {
 			return (move != null);
 		}
-	}
-
-	private void Awake ( ) {
-		faces = new Vector3[6];
 	}
 
 	private void Start ( ) {
@@ -45,20 +41,22 @@ public class Player : MonoBehaviour {
 	private IEnumerator IMove (Vector3 direction, MapTile mapTile) {
 		// TODO: Might have to edit the point if corners of die are "sanded" off
 		Vector3 point = transform.position + ((direction + Vector3.down) / 2f);
-		Vector3 axis = new Vector3(direction.z, 0, (direction.z == 0 ? -1 : 1) * direction.x);
-		float degreesToMove = 90;
+		Vector3 rotationAxis = new Vector3(direction.z, 0, (direction.z == 0 ? -1 : 1) * direction.x);
+		float toRotateDegrees = 90;
 
 		// Slowly rotate the die around a point to have it move
-		while (degreesToMove > 0) {
+		while (toRotateDegrees > 0) {
 			float time = movementSpeed * Time.deltaTime;
-			transform.RotateAround(point, axis, Mathf.Min(time, degreesToMove));
-			degreesToMove -= time;
+
+			transform.RotateAround(point, rotationAxis, Mathf.Min(time, toRotateDegrees));
+
+			toRotateDegrees -= time;
 
 			yield return new WaitForEndOfFrame( );
 		}
 
 		// The tile that the die has just moved onto might have a special movement/rotation
-		mapTile.EffectDie(transform);
+		mapTile.EffectDie(this);
 		// Wait for the tile to finish moving the die
 		while (mapTile.IsMovingDie) {
 			yield return new WaitForEndOfFrame( );
@@ -70,25 +68,28 @@ public class Player : MonoBehaviour {
 		move = null;
 	}
 
-	private void UpdateDie ( ) {
+	public void UpdateDie ( ) {
 		// Snap transform position and rotation so there are no decimals
 		transform.position = Vector3Int.RoundToInt(transform.position);
 		transform.eulerAngles = Vector3Int.RoundToInt(transform.eulerAngles);
 
 		// Update all faces based on the transform rotation
+		// The index is 1 less than the face value, so a 0 index is actually the 1 side of the die
 		faces[0] = transform.up;
 		faces[1] = transform.forward;
 		faces[2] = transform.right * -1;
 		faces[3] = transform.right;
 		faces[4] = transform.forward * -1;
 		faces[5] = transform.up * -1;
+
+		Debug.DrawRay(transform.position, faces[1], Color.red, 2);
 	}
 
-	private int GetNextFace (Vector3 direction, bool roll = true) {
+	private int GetNextBottomFace (Vector3 direction, bool roll) {
 		Vector3 point = transform.position + ((direction + Vector3.down) / 2f);
 		Vector3 axis = new Vector3(direction.z, 0, (direction.z == 0 ? -1 : 1) * direction.x);
 
-		// Temporarily rotate the die in the specified direction to check the next face values
+		// Temporarily rotate the die in the specified direction to check the future face values
 		if (roll) {
 			transform.RotateAround(point, axis, 90);
 			UpdateDie( );
@@ -102,7 +103,7 @@ public class Player : MonoBehaviour {
 			}
 		}
 
-		// Undo the temporary roll so the cube doesnt move
+		// Undo the temporary roll
 		if (roll) {
 			transform.RotateAround(point, axis, -90);
 			UpdateDie( );
@@ -111,7 +112,7 @@ public class Player : MonoBehaviour {
 		return face;
 	}
 
-	private bool IsValidMapTile (Vector3 direction, out MapTile mapTile) {
+	public bool IsValidMapTile (Vector3 direction, out MapTile mapTile, bool roll = true) {
 		mapTile = null;
 
 		// Check to see if there is a world tile at the position dictated by the direction
@@ -123,13 +124,16 @@ public class Player : MonoBehaviour {
 				return false;
 			}
 
-			// TODO: If the map tile that the die is trying to move to has a specific face, make sure the face that will go onto that tile is the same
-			if (mapTile.ExclusiveFace == 0 || GetNextFace(direction) == mapTile.ExclusiveFace) {
+			if (mapTile.ExclusiveFace == 0 || GetNextBottomFace(direction, roll) == mapTile.ExclusiveFace) {
 				return true;
 			}
 		}
 
 		return false;
+	}
+
+	public bool IsValidMapTile (Vector3 direction, bool roll = true) {
+		return IsValidMapTile(direction, out MapTile maptile, roll);
 	}
 
 	private void OnMove (InputValue inputValue) {
