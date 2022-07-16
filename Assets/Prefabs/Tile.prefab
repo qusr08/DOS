@@ -108,8 +108,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39f37c61c92a34a49b94ab82f1716be2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveDieOnStep: {x: 0, y: 0, z: 0}
-  rotateDieOnStep: {x: 0, y: 0, z: 0}
+  Type: 0
   ExclusiveFace: 0
   elevationAmount: 0.25
-  movementSpeed: 3
+  destroyElevationAmount: 1
+  turnSpeed: 180
+  moveSpeed: 2.5

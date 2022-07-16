@@ -5,14 +5,16 @@ using UnityEngine;
 public class MapTile : MonoBehaviour {
 	public enum MapTileType {
 		NONE, ROTATE_90_LEFT, ROTATE_90_RIGHT, ROTATE_180, FLIP,
-		MOVE_NEG_X, MOVE_POS_X, MOVE_POS_Z, MOVE_NEG_Z
+		MOVE_NEG_X, MOVE_POS_X, MOVE_POS_Z, MOVE_NEG_Z, CRACKED
 	}
 
 	[SerializeField] public MapTileType Type;
 	[SerializeField] [Range(0, 6)] public int ExclusiveFace;
 	[Space]
 	[SerializeField] private float elevationAmount;
-	[SerializeField] private float movementSpeed;
+	[SerializeField] private float destroyElevationAmount;
+	[SerializeField] private float turnSpeed;
+	[SerializeField] private float moveSpeed;
 
 	private Coroutine effect = null;
 
@@ -73,21 +75,52 @@ public class MapTile : MonoBehaviour {
 
 		// If the tile specifies that the die should move or rotate, then lerp between the vectors
 		if ((canMove && fromPosition != toPosition) || fromRotation != toRotation) {
-			float time = 0;
-			while (time < 1) {
-				time += movementSpeed * Time.deltaTime;
+			float rotateTime = 0;
+			float moveTime = 0;
 
-				die.transform.position = Vector3.Lerp(fromPosition, toPosition, time);
-				die.transform.rotation = Quaternion.Lerp(fromRotation, toRotation, time);
+			// while (!CloseEnough(die.transform.position, toPosition) || !CloseEnough(die.transform.eulerAngles, toRotation.eulerAngles)) {
+			while (rotateTime < 1 || moveTime < 1) {
+				rotateTime += turnSpeed * Time.deltaTime;
+				moveTime += moveSpeed * Time.deltaTime;
+
+				die.transform.SetPositionAndRotation(
+					Vector3.Slerp(fromPosition, toPosition, moveTime),
+					Quaternion.Slerp(fromRotation, toRotation, rotateTime)
+				);
 
 				yield return new WaitForEndOfFrame( );
 			}
 
 			// Set positions at the end to make sure that the position/rotation of the die doesnt get messed up
-			die.transform.position = toPosition;
-			die.transform.rotation = toRotation;
+			die.transform.SetPositionAndRotation(toPosition, toRotation);
 		}
 
 		effect = null;
+	}
+
+	private IEnumerator IDestroyTile ( ) {
+		Vector3 fromPosition = transform.position;
+		Vector3 toPosition = transform.position + (Vector3.down * destroyElevationAmount);
+
+		float time = 0;
+		while (time < 1) {
+			time += moveSpeed * Time.deltaTime;
+
+			transform.position = Vector3.Slerp(fromPosition, toPosition, time);
+
+			yield return new WaitForEndOfFrame( );
+		}
+
+		transform.position = toPosition;
+
+		Destroy(gameObject);
+	}
+
+	public void DestroyTile ( ) {
+		StartCoroutine(IDestroyTile( ));
+	}
+
+	private bool CloseEnough (Vector3 vector1, Vector3 vector2) {
+		return ((vector1 - vector2).magnitude <= 0.005f);
 	}
 }
