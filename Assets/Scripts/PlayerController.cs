@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Die : MonoBehaviour {
+public class PlayerController : MonoBehaviour {
 	[SerializeField] [Min(0.001f)] private float movementSpeed;
 
 	private Coroutine move = null;
@@ -55,15 +55,15 @@ public class Die : MonoBehaviour {
 			yield return new WaitForEndOfFrame( );
 		}
 
+		// Round values so there are no decimal places and update all face directions
+		UpdateDie( );
+
 		// The tile that the die has just moved onto might have a special movement/rotation
 		mapTile.EffectDie(this);
 		// Wait for the tile to finish moving the die
 		while (mapTile.IsMovingDie) {
 			yield return new WaitForEndOfFrame( );
 		}
-
-		// Round values so there are no decimal places and update all face directions
-		UpdateDie( );
 
 		move = null;
 	}
@@ -82,7 +82,8 @@ public class Die : MonoBehaviour {
 		faces[4] = transform.forward * -1;
 		faces[5] = transform.up * -1;
 
-		Debug.DrawRay(transform.position, faces[1], Color.red, 2);
+		Debug.DrawRay(transform.position, faces[0], Color.red, 1);
+		Debug.DrawRay(transform.position, faces[1], Color.blue, 1);
 	}
 
 	private int GetNextBottomFace (Vector3 direction, bool roll) {

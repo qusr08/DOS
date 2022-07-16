@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class MapTile : MonoBehaviour {
 	public enum MapTileType {
-		NONE, ROTATE_90_LEFT, ROTATE_90_RIGHT, ROTATE_180, FLIP, MOVE_LEFT, MOVE_RIGHT, MOVE_UP, MOVE_DOWN
+		NONE, ROTATE_90_LEFT, ROTATE_90_RIGHT, ROTATE_180, FLIP,
+		MOVE_NEG_X, MOVE_POS_X, MOVE_POS_Z, MOVE_NEG_Z
 	}
 
 	[SerializeField] public MapTileType Type;
@@ -25,13 +26,13 @@ public class MapTile : MonoBehaviour {
 		// TODO: update the model of the tile based on the serialized values in Unity
 	}
 
-	public void EffectDie (Die die) {
+	public void EffectDie (PlayerController die) {
 		if (!IsMovingDie) {
 			effect = StartCoroutine(IEffectDie(die));
 		}
 	}
 
-	private IEnumerator IEffectDie (Die die) {
+	private IEnumerator IEffectDie (PlayerController die) {
 		// TODO: make die float above the tile while rotating ???
 
 		Vector3 fromPosition = die.transform.position;
@@ -53,16 +54,16 @@ public class MapTile : MonoBehaviour {
 			case MapTileType.FLIP:
 				toRotation = Quaternion.AngleAxis(180, Vector3.right) * fromRotation;
 				break;
-			case MapTileType.MOVE_LEFT:
+			case MapTileType.MOVE_NEG_X:
 				toPosition += Vector3.left;
 				break;
-			case MapTileType.MOVE_RIGHT:
+			case MapTileType.MOVE_POS_X:
 				toPosition += Vector3.right;
 				break;
-			case MapTileType.MOVE_UP:
+			case MapTileType.MOVE_POS_Z:
 				toPosition += Vector3.forward;
 				break;
-			case MapTileType.MOVE_DOWN:
+			case MapTileType.MOVE_NEG_Z:
 				toPosition += Vector3.back;
 				break;
 		}
