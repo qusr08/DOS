@@ -19,6 +19,11 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] private float fadeSpeed;
 	[SerializeField] private CameraController cameraController;
 	[Space]
+	[SerializeField] private AudioSource audioSource;
+	[SerializeField] private AudioClip dieMovingSoundEffect;
+	[SerializeField] private AudioClip levelCompleteSoundEffect;
+	[SerializeField] private AudioClip UIInteractSoundEffect;
+	[Space]
 	[SerializeField] public GameState State;
 	[SerializeField] public LevelManager CurrentLevel;
 
@@ -84,6 +89,7 @@ public class GameManager : MonoBehaviour {
 				levelPause.SetActive(true);
 				break;
 			case GameState.LEVEL_COMPLETE:
+				PlayLevelCompleteSoundEffect( );
 				levelComplete.SetActive(true);
 				break;
 		}
@@ -95,4 +101,17 @@ public class GameManager : MonoBehaviour {
 			yield return new WaitForEndOfFrame( );
 		}
 	}
+
+	public void PlayDieMoveSoundEffect ( ) {
+		audioSource.PlayOneShot(dieMovingSoundEffect, 0.35f);
+	}
+
+	public void PlayLevelCompleteSoundEffect ( ) {
+		audioSource.PlayOneShot(levelCompleteSoundEffect, 0.6f);
+	}
+
+	public void PlayUIInteractSoundEffect ( ) {
+		audioSource.PlayOneShot(UIInteractSoundEffect, 0.4f);
+	}
+
 }

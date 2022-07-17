@@ -65,6 +65,8 @@ public class PlayerController : MonoBehaviour {
 			yield return new WaitForEndOfFrame( );
 		}
 
+		gameManager.PlayDieMoveSoundEffect( );
+
 		if (currentTile.Type == MapTile.MapTileType.CRACKED) {
 			currentTile.DestroyTile( );
 		}

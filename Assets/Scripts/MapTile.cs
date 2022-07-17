@@ -40,9 +40,11 @@ public class MapTile : MonoBehaviour {
 	private void OnValidate ( ) {
 		meshRenderer = GetComponentInChildren<MeshRenderer>( );
 
+#if UNITY_EDITOR
 		if (UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage( ) == null) {
 			name = $"Tile ({Type}) ({ExclusiveFace})";
 		}
+#endif
 
 		Material material = new Material(mapTileMaterial);
 		Texture texture = null;
