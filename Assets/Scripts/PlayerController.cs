@@ -41,8 +41,8 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		// If the two face is facing upwards the player wins the level
-		if (faces[1] == Vector3.up) {
-			// TODO: trigger a win in the game
+		if (faces[1] == Vector3.up && gameManager.State == GameManager.GameState.LEVEL) {
+			gameManager.SetGameState(GameManager.GameState.LEVEL_COMPLETE);
 		}
 	}
 

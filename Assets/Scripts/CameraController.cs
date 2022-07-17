@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour {
-	[SerializeField] private MapManager map;
 	[SerializeField] private PlayerController die;
 	[SerializeField] private GameManager gameManager;
 	[Space]
@@ -17,11 +16,10 @@ public class CameraController : MonoBehaviour {
 	private Vector3 velocity;
 
 	private void OnValidate ( ) {
-		map = FindObjectOfType<MapManager>( );
 		die = FindObjectOfType<PlayerController>( );
 		gameManager = FindObjectOfType<GameManager>( );
 
-		if (die == null || map == null) {
+		if (die == null) {
 			return;
 		}
 
@@ -39,9 +37,14 @@ public class CameraController : MonoBehaviour {
 		UpdatePosition( );
 	}
 
+	private void LateUpdate ( ) {
+		if (gameManager.State == GameManager.GameState.LEVEL_RESTART && (transform.position - toPosition).magnitude < 2f) {
+			gameManager.CurrentLevel.StartLevel( );
+		}
+	}
+
 	private void UpdatePosition ( ) {
 		// Update the position that the camera should look at
-		// toPosition = (map.AverageMapPosition + die.transform.position) / 2f;
 		toPosition = die.transform.position;
 
 		// Move the camera to different menus
@@ -54,9 +57,14 @@ public class CameraController : MonoBehaviour {
 				toPosition.z += horizontalMenuOffset;
 
 				break;
-			case GameManager.GameState.LEVEL_INTERRUPT:
+			case GameManager.GameState.LEVEL_PAUSE:
+			case GameManager.GameState.LEVEL_COMPLETE:
 				toPosition.x += horizontalMenuOffset;
 				toPosition.z += horizontalMenuOffset;
+
+				break;
+			case GameManager.GameState.LEVEL_RESTART:
+				toPosition.y += verticalMenuOffset / 2f;
 
 				break;
 		}
