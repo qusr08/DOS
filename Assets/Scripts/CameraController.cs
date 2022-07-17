@@ -52,9 +52,7 @@ public class CameraController : MonoBehaviour {
 			case GameManager.GameState.MAIN_MENU:
 			case GameManager.GameState.LEVEL_SELECT:
 			case GameManager.GameState.CREDITS:
-				toPosition.x += horizontalMenuOffset;
-				toPosition.y += verticalMenuOffset;
-				toPosition.z += horizontalMenuOffset;
+				toPosition = new Vector3(horizontalMenuOffset, verticalMenuOffset, horizontalMenuOffset);
 
 				break;
 			case GameManager.GameState.LEVEL_PAUSE:
@@ -64,7 +62,7 @@ public class CameraController : MonoBehaviour {
 
 				break;
 			case GameManager.GameState.LEVEL_RESTART:
-				toPosition.y += verticalMenuOffset / 2f;
+				toPosition = new Vector3(0, verticalMenuOffset / 2f, 0);
 
 				break;
 		}

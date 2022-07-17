@@ -8,6 +8,8 @@ public class MapTile : MonoBehaviour {
 		MOVE_NEG_X, MOVE_POS_X, MOVE_POS_Z, MOVE_NEG_Z, CRACKED
 	}
 
+	[SerializeField] private MeshRenderer meshRenderer;
+	[Space]
 	[SerializeField] public MapTileType Type;
 	[SerializeField] [Range(0, 6)] public int ExclusiveFace;
 	[Space]
@@ -33,6 +35,8 @@ public class MapTile : MonoBehaviour {
 
 	private void OnValidate ( ) {
 		// TODO: update the model of the tile based on the serialized values in Unity
+
+		meshRenderer = GetComponent<MeshRenderer>( );
 
 		name = $"Tile ({Type}) ({ExclusiveFace})";
 	}
@@ -137,10 +141,18 @@ public class MapTile : MonoBehaviour {
 		// Set positions at the end to make sure that the position/rotation of the die doesnt get messed up
 		transform.SetPositionAndRotation(toPosition, toRotation);
 
-		Destroy(gameObject);
+		meshRenderer.enabled = false;
 	}
 
 	public void DestroyTile ( ) {
 		destroy = StartCoroutine(IDestroyTile( ));
+	}
+
+	public void ResetTile ( ) {
+		transform.localPosition = new Vector3(transform.position.x, 0, transform.position.z);
+		transform.eulerAngles = Vector3.zero;
+
+		meshRenderer.enabled = true;
+		destroy = null;
 	}
 }

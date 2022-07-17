@@ -32,9 +32,15 @@ public class LevelManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 		gameManager.CurrentLevel = this;
 		gameManager.SetGameState(GameManager.GameState.LEVEL);
 
+		// Make sure the die starts in the correct position
 		die.transform.position = Vector3.zero;
 		die.transform.eulerAngles = diceStartingRotation;
 		die.UpdateDie( );
+
+		// Make sure all tiles start in the correct position
+		foreach (MapTile mapTile in LevelGameObject.transform.GetComponentsInChildren<MapTile>( )) {
+			mapTile.ResetTile( );
+		}
 	}
 
 	public void OnPointerEnter (PointerEventData eventData) {

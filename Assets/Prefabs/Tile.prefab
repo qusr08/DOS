@@ -108,6 +108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39f37c61c92a34a49b94ab82f1716be2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  meshRenderer: {fileID: 3656285002223081601}
   Type: 0
   ExclusiveFace: 0
   elevationAmount: 0.25
