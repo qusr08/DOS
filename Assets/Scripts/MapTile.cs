@@ -52,7 +52,7 @@ public class MapTile : MonoBehaviour {
 			texture = textureTypes[(int) Type];
 		}
 
-		material.SetTexture("_MainTex", texture);
+		material.mainTexture = texture;
 		meshRenderer.material = material;
 	}
 
@@ -150,6 +150,10 @@ public class MapTile : MonoBehaviour {
 			rotateTime += turnSpeed * Time.deltaTime;
 			moveTime += moveSpeed * Time.deltaTime;
 
+			Color c = meshRenderer.material.color;
+			c.a = 1f - moveTime;
+			meshRenderer.material.color = c;
+
 			yield return new WaitForEndOfFrame( );
 		}
 
@@ -166,6 +170,10 @@ public class MapTile : MonoBehaviour {
 	public void ResetTile ( ) {
 		transform.localPosition = new Vector3(transform.position.x, 0, transform.position.z);
 		transform.eulerAngles = Vector3.zero;
+
+		Color c = meshRenderer.material.color;
+		c.a = 1f;
+		meshRenderer.material.color = c;
 
 		meshRenderer.enabled = true;
 		destroy = null;
