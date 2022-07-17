@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour {
+	[SerializeField] private GameManager gameManager;
+	[Space]
 	[SerializeField] [Min(0.001f)] public float RollSpeed;
 
 	private Coroutine move = null;
@@ -16,7 +18,13 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
+	private void OnValidate ( ) {
+		gameManager = FindObjectOfType<GameManager>( );
+	}
+
 	private void Start ( ) {
+		OnValidate( );
+
 		UpdateDie( );
 	}
 
@@ -65,7 +73,7 @@ public class PlayerController : MonoBehaviour {
 		// The tile that the die has just moved onto might have a special movement/rotation
 		toMapTile.EffectDie(this);
 		// Wait for the tile to finish moving the die
-		while (toMapTile.IsMovingDie) {
+		while (toMapTile.IsEffectingDie) {
 			yield return new WaitForEndOfFrame( );
 		}
 
@@ -133,6 +141,11 @@ public class PlayerController : MonoBehaviour {
 				return false;
 			}
 
+			// If the tile is being destroyed do not count it as an actual tile
+			if (toMapTile.IsDestroyed) {
+				return false;
+			}
+
 			if (toMapTile.ExclusiveFace == 0 || GetNextBottomFace(direction, roll) == toMapTile.ExclusiveFace) {
 				return true;
 			}
@@ -146,6 +159,10 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	private void OnMove (InputValue inputValue) {
+		if (gameManager.State != GameManager.GameState.LEVEL) {
+			return;
+		}
+
 		Vector2 input = inputValue.Get<Vector2>( );
 
 		movement = new Vector3(input.x, 0, input.y);

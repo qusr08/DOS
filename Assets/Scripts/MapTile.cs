@@ -17,8 +17,15 @@ public class MapTile : MonoBehaviour {
 	[SerializeField] private float moveSpeed;
 
 	private Coroutine effect = null;
+	private Coroutine destroy = null;
 
-	public bool IsMovingDie {
+	public bool IsDestroyed {
+		get {
+			return (destroy != null);
+		}
+	}
+
+	public bool IsEffectingDie {
 		get {
 			return (effect != null);
 		}
@@ -26,10 +33,16 @@ public class MapTile : MonoBehaviour {
 
 	private void OnValidate ( ) {
 		// TODO: update the model of the tile based on the serialized values in Unity
+
+		name = $"Tile ({Type}) ({ExclusiveFace})";
+	}
+
+	private void Start ( ) {
+		OnValidate( );
 	}
 
 	public void EffectDie (PlayerController die) {
-		if (!IsMovingDie) {
+		if (!IsEffectingDie) {
 			effect = StartCoroutine(IEffectDie(die));
 		}
 	}
@@ -45,10 +58,10 @@ public class MapTile : MonoBehaviour {
 		// Get the from and to positions to move the die by
 		switch (Type) {
 			case MapTileType.ROTATE_90_LEFT:
-				toRotation = Quaternion.AngleAxis(90, Vector3.up) * fromRotation;
+				toRotation = Quaternion.AngleAxis(-90, Vector3.up) * fromRotation;
 				break;
 			case MapTileType.ROTATE_90_RIGHT:
-				toRotation = Quaternion.AngleAxis(-90, Vector3.up) * fromRotation;
+				toRotation = Quaternion.AngleAxis(90, Vector3.up) * fromRotation;
 				break;
 			case MapTileType.ROTATE_180:
 				toRotation = Quaternion.AngleAxis(180, Vector3.up) * fromRotation;
@@ -80,13 +93,13 @@ public class MapTile : MonoBehaviour {
 
 			// while (!CloseEnough(die.transform.position, toPosition) || !CloseEnough(die.transform.eulerAngles, toRotation.eulerAngles)) {
 			while (rotateTime < 1 || moveTime < 1) {
-				rotateTime += turnSpeed * Time.deltaTime;
-				moveTime += moveSpeed * Time.deltaTime;
-
 				die.transform.SetPositionAndRotation(
-					Vector3.Slerp(fromPosition, toPosition, moveTime),
+					Vector3.Lerp(fromPosition, toPosition, moveTime),
 					Quaternion.Slerp(fromRotation, toRotation, rotateTime)
 				);
+
+				rotateTime += turnSpeed * Time.deltaTime;
+				moveTime += moveSpeed * Time.deltaTime;
 
 				yield return new WaitForEndOfFrame( );
 			}
@@ -101,26 +114,33 @@ public class MapTile : MonoBehaviour {
 	private IEnumerator IDestroyTile ( ) {
 		Vector3 fromPosition = transform.position;
 		Vector3 toPosition = transform.position + (Vector3.down * destroyElevationAmount);
+		Quaternion fromRotation = transform.rotation;
+		Quaternion toRotation =
+			Quaternion.AngleAxis(Random.Range(-30, 30), Vector3.right) *
+			Quaternion.AngleAxis(Random.Range(-30, 30), Vector3.forward) * transform.rotation;
 
-		float time = 0;
-		while (time < 1) {
-			time += moveSpeed * Time.deltaTime;
+		float rotateTime = 0;
+		float moveTime = 0;
 
-			transform.position = Vector3.Slerp(fromPosition, toPosition, time);
+		while (rotateTime < 1 || moveTime < 1) {
+			transform.SetPositionAndRotation(
+				Vector3.Lerp(fromPosition, toPosition, moveTime),
+				Quaternion.Slerp(fromRotation, toRotation, rotateTime)
+			);
+
+			rotateTime += turnSpeed * Time.deltaTime;
+			moveTime += moveSpeed * Time.deltaTime;
 
 			yield return new WaitForEndOfFrame( );
 		}
 
-		transform.position = toPosition;
+		// Set positions at the end to make sure that the position/rotation of the die doesnt get messed up
+		transform.SetPositionAndRotation(toPosition, toRotation);
 
 		Destroy(gameObject);
 	}
 
 	public void DestroyTile ( ) {
-		StartCoroutine(IDestroyTile( ));
-	}
-
-	private bool CloseEnough (Vector3 vector1, Vector3 vector2) {
-		return ((vector1 - vector2).magnitude <= 0.005f);
+		destroy = StartCoroutine(IDestroyTile( ));
 	}
 }

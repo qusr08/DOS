@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Map : MonoBehaviour {
-	public Vector3 AverageMapPosition;
+public class MapManager : MonoBehaviour {
+	/*public Vector3 AverageMapPosition;
 
 	private void Start ( ) {
 		Vector3 positionSum = Vector3.zero;
@@ -12,5 +12,7 @@ public class Map : MonoBehaviour {
 		}
 
 		AverageMapPosition = positionSum / transform.childCount;
-	}
+	}*/
+
+
 }
