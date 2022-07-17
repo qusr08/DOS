@@ -9,12 +9,13 @@ public class MapTile : MonoBehaviour {
 	}
 
 	[SerializeField] private MeshRenderer meshRenderer;
+	[SerializeField] private Material mapTileMaterial;
+	[SerializeField] private Material fadeMapTileMaterial;
 	[Space]
 	[SerializeField] public MapTileType Type;
 	[SerializeField] [Range(0, 6)] public int ExclusiveFace;
 	[SerializeField] private Texture[ ] textureTypes;
 	[SerializeField] private Texture[ ] textureFaces;
-	[SerializeField] private Material mapTileMaterial;
 	[Space]
 	[SerializeField] private float elevationAmount;
 	[SerializeField] private float destroyElevationAmount;
@@ -141,6 +142,11 @@ public class MapTile : MonoBehaviour {
 		float rotateTime = 0;
 		float moveTime = 0;
 
+		// Set the mesh renderer to have a fadeable material
+		Material material = new Material(fadeMapTileMaterial);
+		material.mainTexture = meshRenderer.material.mainTexture;
+		meshRenderer.material = material;
+
 		while (rotateTime < 1 || moveTime < 1) {
 			transform.SetPositionAndRotation(
 				Vector3.Lerp(fromPosition, toPosition, moveTime),
@@ -171,9 +177,10 @@ public class MapTile : MonoBehaviour {
 		transform.localPosition = new Vector3(transform.position.x, 0, transform.position.z);
 		transform.eulerAngles = Vector3.zero;
 
-		Color c = meshRenderer.material.color;
-		c.a = 1f;
-		meshRenderer.material.color = c;
+		// Set the mesh renderer to have a fadeable material
+		Material material = new Material(mapTileMaterial);
+		material.mainTexture = meshRenderer.material.mainTexture;
+		meshRenderer.material = material;
 
 		meshRenderer.enabled = true;
 		destroy = null;

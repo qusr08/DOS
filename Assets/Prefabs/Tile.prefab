@@ -105,6 +105,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshRenderer: {fileID: 3901405440831097881}
+  mapTileMaterial: {fileID: 2100000, guid: 7ac98285d9cd861439faf650380d25d5, type: 2}
+  fadeMapTileMaterial: {fileID: 2100000, guid: 5e1dfacb6fa99ff45a9c09fc341d02c0, type: 2}
   Type: 0
   ExclusiveFace: 0
   textureTypes:
@@ -125,7 +127,6 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 4b923e1b3b82d9e40b2ea6d987a86c29, type: 3}
   - {fileID: 2800000, guid: 2ef9704b3e74d7f46bc80cf2b56c3642, type: 3}
   - {fileID: 2800000, guid: 2d984baac9167ed4686d8e29f66cc1f2, type: 3}
-  mapTileMaterial: {fileID: 2100000, guid: 5e1dfacb6fa99ff45a9c09fc341d02c0, type: 2}
   elevationAmount: 0.25
   destroyElevationAmount: 3
   turnSpeed: 2.5

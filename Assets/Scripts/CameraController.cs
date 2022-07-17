@@ -8,6 +8,7 @@ public class CameraController : MonoBehaviour {
 	[Space]
 	[SerializeField] private float distance;
 	[SerializeField] [Range(0, 1)] private float smoothness;
+	[SerializeField] public bool IsFlipped;
 	[Space]
 	[SerializeField] private float horizontalMenuOffset;
 	[SerializeField] private float verticalMenuOffset;
@@ -43,9 +44,13 @@ public class CameraController : MonoBehaviour {
 		}
 	}
 
-	private void UpdatePosition ( ) {
+	private void UpdatePosition (bool instantly = false) {
 		// Update the position that the camera should look at
 		toPosition = die.transform.position;
+
+		float w = distance * Mathf.Cos(transform.eulerAngles.x * Mathf.Deg2Rad);
+		float n = Mathf.Sin(transform.eulerAngles.y * Mathf.Deg2Rad);
+		float v = n / Mathf.Abs(n);
 
 		// Move the camera to different menus
 		switch (gameManager.State) {
@@ -57,8 +62,8 @@ public class CameraController : MonoBehaviour {
 				break;
 			case GameManager.GameState.LEVEL_PAUSE:
 			case GameManager.GameState.LEVEL_COMPLETE:
-				toPosition.x += horizontalMenuOffset;
-				toPosition.z += horizontalMenuOffset;
+				toPosition.x += -v * horizontalMenuOffset;
+				toPosition.z += -v * horizontalMenuOffset;
 
 				break;
 			case GameManager.GameState.LEVEL_RESTART:
@@ -71,9 +76,25 @@ public class CameraController : MonoBehaviour {
 				break;
 		}
 
-		float w = distance * Mathf.Cos(transform.eulerAngles.x * Mathf.Deg2Rad);
-		toPosition.x += w / Mathf.Sqrt(2);
+		toPosition.x += (v * -w) / Mathf.Sqrt(2);
 		toPosition.y += distance * Mathf.Sin(transform.eulerAngles.x * Mathf.Deg2Rad);
-		toPosition.z += -w / Mathf.Sqrt(2);
+		toPosition.z += (v * w) / Mathf.Sqrt(2);
+
+		if (instantly) {
+			transform.position = toPosition;
+		}
+	}
+
+	public void FlipCamera ( ) {
+		FlipCamera(!IsFlipped);
+	}
+
+	public void FlipCamera (bool flipCamera) {
+		if (flipCamera != IsFlipped) {
+			transform.RotateAround(die.transform.position, Vector3.up, 180);
+			UpdatePosition(true);
+		}
+
+		IsFlipped = flipCamera;
 	}
 }

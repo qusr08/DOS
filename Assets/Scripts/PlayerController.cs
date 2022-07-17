@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour {
 	[SerializeField] private GameManager gameManager;
+	[SerializeField] private CameraController cameraController;
 	[Space]
 	[SerializeField] [Min(0.001f)] public float RollSpeed;
 
@@ -177,6 +178,6 @@ public class PlayerController : MonoBehaviour {
 
 		Vector2 input = inputValue.Get<Vector2>( );
 
-		movement = new Vector3(input.x, 0, input.y);
+		movement = new Vector3(input.x, 0, input.y) * (cameraController.IsFlipped ? -1 : 1);
 	}
 }
