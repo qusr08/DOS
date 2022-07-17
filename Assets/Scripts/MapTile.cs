@@ -12,6 +12,9 @@ public class MapTile : MonoBehaviour {
 	[Space]
 	[SerializeField] public MapTileType Type;
 	[SerializeField] [Range(0, 6)] public int ExclusiveFace;
+	[SerializeField] private Texture[ ] textureTypes;
+	[SerializeField] private Texture[ ] textureFaces;
+	[SerializeField] private Material mapTileMaterial;
 	[Space]
 	[SerializeField] private float elevationAmount;
 	[SerializeField] private float destroyElevationAmount;
@@ -34,11 +37,23 @@ public class MapTile : MonoBehaviour {
 	}
 
 	private void OnValidate ( ) {
-		// TODO: update the model of the tile based on the serialized values in Unity
+		meshRenderer = GetComponentInChildren<MeshRenderer>( );
 
-		meshRenderer = GetComponent<MeshRenderer>( );
+		if (UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage( ) == null) {
+			name = $"Tile ({Type}) ({ExclusiveFace})";
+		}
 
-		name = $"Tile ({Type}) ({ExclusiveFace})";
+		Material material = new Material(mapTileMaterial);
+		Texture texture = null;
+
+		if (ExclusiveFace > 0) {
+			texture = textureFaces[ExclusiveFace - 1];
+		} else {
+			texture = textureTypes[(int) Type];
+		}
+
+		material.SetTexture("_MainTex", texture);
+		meshRenderer.material = material;
 	}
 
 	private void Start ( ) {

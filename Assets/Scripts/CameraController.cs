@@ -65,6 +65,10 @@ public class CameraController : MonoBehaviour {
 				toPosition = new Vector3(0, verticalMenuOffset / 2f, 0);
 
 				break;
+			case GameManager.GameState.HELP:
+				toPosition = new Vector3(horizontalMenuOffset * 3.5f, verticalMenuOffset, horizontalMenuOffset * 3.5f);
+
+				break;
 		}
 
 		float w = distance * Mathf.Cos(transform.eulerAngles.x * Mathf.Deg2Rad);

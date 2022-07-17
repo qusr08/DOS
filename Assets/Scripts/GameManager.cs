@@ -4,12 +4,13 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour {
 	public enum GameState {
-		MAIN_MENU, LEVEL_SELECT, CREDITS, LEVEL, LEVEL_PAUSE, LEVEL_COMPLETE, LEVEL_RESTART
+		MAIN_MENU, LEVEL_SELECT, CREDITS, LEVEL, LEVEL_PAUSE, LEVEL_COMPLETE, LEVEL_RESTART, HELP
 	}
 
 	[SerializeField] private GameObject mainMenu;
 	[SerializeField] private GameObject levelSelect;
 	[SerializeField] private GameObject credits;
+	[SerializeField] private GameObject help;
 	[SerializeField] private GameObject level;
 	[SerializeField] private GameObject levelPause;
 	[SerializeField] private GameObject levelComplete;
@@ -27,6 +28,7 @@ public class GameManager : MonoBehaviour {
 		mainMenu.SetActive(false);
 		levelSelect.SetActive(false);
 		credits.SetActive(false);
+		help.SetActive(false);
 		level.SetActive(false);
 		levelPause.SetActive(false);
 		levelComplete.SetActive(false);
@@ -40,6 +42,9 @@ public class GameManager : MonoBehaviour {
 				break;
 			case GameState.CREDITS:
 				credits.SetActive(true);
+				break;
+			case GameState.HELP:
+				help.SetActive(true);
 				break;
 			case GameState.LEVEL:
 				level.SetActive(true);
